@@ -1,0 +1,133 @@
+.container {
+    padding: var(--space-6);
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-6);
+    gap: var(--space-4);
+}
+
+.header h1 {
+    margin: 0;
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.subtitle {
+    margin: var(--space-2) 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+}
+
+.error {
+    padding: var(--space-3);
+    background: var(--color-danger-light);
+    border: 1px solid var(--color-danger);
+    border-radius: var(--radius-md);
+    color: var(--color-danger-dark);
+    font-size: var(--font-size-sm);
+}
+
+.tableContainer {
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table thead {
+    background: var(--color-background-secondary);
+}
+
+.table th {
+    padding: var(--space-3);
+    text-align: left;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    border-bottom: 2px solid var(--color-border);
+}
+
+.table td {
+    padding: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+    font-size: var(--font-size-sm);
+}
+
+.table tbody tr:hover {
+    background: var(--color-background-hover);
+}
+
+.nameCell {
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.descriptionCell {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--color-text-secondary);
+}
+
+.badge {
+    display: inline-block;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+}
+
+.badgeSuccess {
+    background: var(--color-success-light);
+    color: var(--color-success-dark);
+}
+
+.badgeInactive {
+    background: var(--color-gray-100);
+    color: var(--color-gray-600);
+}
+
+.actions {
+    display: flex;
+    gap: var(--space-2);
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: var(--space-4);
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .formGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .tableContainer {
+        overflow-x: scroll;
+    }
+
+    .table {
+        min-width: 800px;
+    }
+}

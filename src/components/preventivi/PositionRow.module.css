@@ -1,0 +1,44 @@
+.positionCard {
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+  padding: var(--space-3, 0.75rem);
+  margin-bottom: var(--space-3, 0.75rem);
+  background: var(--color-surface, #ffffff);
+}
+.positionHeader {
+  display: flex;
+  gap: var(--space-3, 0.75rem);
+  align-items: flex-start;
+}
+.positionNumber {
+  font-weight: 600;
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-primary, #1B4F72);
+  padding-top: 1.8rem;
+  white-space: nowrap;
+}
+.fieldRow {
+  display: flex;
+  gap: var(--space-3, 0.75rem);
+  flex: 1;
+  flex-wrap: wrap;
+}
+.optionsToggle {
+  background: none;
+  border: none;
+  color: var(--color-secondary, #00A9CE);
+  cursor: pointer;
+  padding: var(--space-2, 0.5rem) 0;
+  font-size: var(--text-sm, 0.875rem);
+}
+.optionsToggle:hover {
+  text-decoration: underline;
+}
+.positionFooter {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--space-2, 0.5rem);
+  border-top: 1px solid var(--color-border, #e2e8f0);
+  margin-top: var(--space-2, 0.5rem);
+  font-size: var(--text-sm, 0.875rem);
+}

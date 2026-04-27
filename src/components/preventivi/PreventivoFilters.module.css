@@ -1,0 +1,145 @@
+.filtersContainer {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+    flex-wrap: wrap;
+}
+
+/* Search Input */
+.searchWrapper {
+    position: relative;
+    flex: 1;
+    min-width: 280px;
+}
+
+.searchIcon {
+    position: absolute;
+    left: var(--space-3);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-muted);
+    pointer-events: none;
+}
+
+.searchInput {
+    width: 100%;
+    padding: var(--space-3) var(--space-4) var(--space-3) var(--space-10);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    outline: none;
+    transition: all var(--transition-fast);
+}
+
+.searchInput:focus {
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+.searchInput::placeholder {
+    color: var(--color-text-muted);
+}
+
+/* Select */
+.selectWrapper {
+    min-width: 160px;
+}
+
+.select {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: var(--space-10);
+    transition: all var(--transition-fast);
+}
+
+.select:focus {
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+/* Date Inputs */
+.dateWrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.dateInput {
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-text);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    outline: none;
+    cursor: pointer;
+    min-width: 140px;
+    transition: all var(--transition-fast);
+}
+
+.dateInput:focus {
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+.dateSeparator {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+}
+
+/* Clear Button */
+.clearBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    color: var(--color-text-secondary);
+    background-color: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.clearBtn:hover {
+    color: var(--color-error);
+    border-color: var(--color-error);
+    background-color: var(--color-error-bg);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .filtersContainer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .searchWrapper,
+    .selectWrapper,
+    .dateWrapper {
+        min-width: 100%;
+    }
+
+    .dateWrapper {
+        justify-content: space-between;
+    }
+
+    .dateInput {
+        flex: 1;
+    }
+}

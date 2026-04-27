@@ -1,0 +1,226 @@
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    background: linear-gradient(180deg, #1e3a4c 0%, #1a3343 100%);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: var(--z-fixed);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.logo {
+    padding: var(--space-5) var(--space-5) var(--space-6);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logoLink {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    text-decoration: none;
+    color: white;
+}
+
+.logoIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    color: white;
+}
+
+.logoText {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    color: white;
+    letter-spacing: -0.02em;
+}
+
+.nav {
+    flex: 1;
+    padding: var(--space-4) var(--space-3);
+}
+
+.navList {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.navLink {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2);
+    border-radius: var(--radius-md);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    transition: all var(--transition-fast);
+}
+
+.navLink:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: white;
+}
+
+.navLink.active {
+    background-color: #0ea5e9;
+    color: white;
+}
+
+.linkContent {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex: 1;
+    color: inherit;
+    text-decoration: none;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+}
+
+.toggleBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: inherit;
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+.toggleBtn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.hasSubmenu {
+    position: relative;
+}
+
+.chevron {
+    margin-left: auto;
+    transition: transform var(--transition-fast);
+}
+
+.chevronOpen {
+    transform: rotate(90deg);
+}
+
+.submenu {
+    list-style: none;
+    padding: var(--space-1) 0;
+    margin: 0;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-md);
+    margin-top: var(--space-1);
+}
+
+.submenuLink {
+    display: block;
+    padding: var(--space-2) var(--space-4) var(--space-2) calc(var(--space-4) + 28px);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: var(--text-sm);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    margin: 0 var(--space-2);
+}
+
+.submenuLink:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: white;
+}
+
+.submenuLink.active {
+    background-color: rgba(14, 165, 233, 0.3);
+    color: white;
+}
+
+.navIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.navLabel {
+    white-space: nowrap;
+}
+
+.footer {
+    padding: var(--space-4) var(--space-5);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.userAvatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: white;
+}
+
+.version {
+    font-size: var(--text-xs);
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Separatore tra menu principale e link CRM */
+.navSeparator {
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: var(--space-3) var(--space-2);
+}
+
+/* Stile speciale per il link CRM (button che si comporta come navLink) */
+.crmLink {
+    width: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    color: rgba(255, 255, 255, 0.6);
+    font-family: inherit;
+}
+
+.crmLink:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: white;
+}
+
+.crmLink:disabled {
+    opacity: 0.5;
+    cursor: wait;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform var(--transition-base);
+    }
+    
+    .sidebar.open {
+        transform: translateX(0);
+    }
+}

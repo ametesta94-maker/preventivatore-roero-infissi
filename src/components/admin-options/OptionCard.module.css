@@ -1,0 +1,194 @@
+.optionCard {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    margin-bottom: var(--space-3);
+    transition: box-shadow var(--transition-fast);
+}
+
+.optionCard:hover {
+    box-shadow: var(--shadow-sm);
+}
+
+.optionCard.inactive {
+    opacity: 0.55;
+}
+
+.optionHeader {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.optionInfo {
+    flex: 1;
+    min-width: 0;
+}
+
+.optionTitle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-1);
+}
+
+.optionLabel {
+    font-size: var(--text-base);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-dark);
+}
+
+.keyCode {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    background: var(--color-surface-hover);
+    padding: 1px 6px;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary);
+}
+
+.optionMeta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin-top: var(--space-1);
+}
+
+.metaItem {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+}
+
+.optionActions {
+    display: flex;
+    gap: var(--space-2);
+    flex-shrink: 0;
+}
+
+.typeBadge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.typeSelect {
+    background: rgba(49, 130, 206, 0.12);
+    color: #3182CE;
+}
+
+.typeMultiSelect {
+    background: rgba(128, 90, 213, 0.12);
+    color: #805AD5;
+}
+
+.typeBoolean {
+    background: rgba(56, 161, 105, 0.12);
+    color: #38A169;
+}
+
+.typeText {
+    background: rgba(113, 128, 150, 0.12);
+    color: #718096;
+}
+
+.typeNumber {
+    background: rgba(214, 158, 46, 0.12);
+    color: #B7791F;
+}
+
+/* Values table */
+.valuesSection {
+    margin-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-3);
+}
+
+.valuesHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-2);
+}
+
+.valuesTitle {
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.valuesTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+}
+
+.valuesTable th {
+    text-align: left;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-background);
+}
+
+.valueRow {
+    border-bottom: 1px solid var(--color-border);
+    transition: background var(--transition-fast);
+}
+
+.valueRow:hover {
+    background: var(--color-surface-hover);
+}
+
+.valueRow.inactive {
+    opacity: 0.5;
+}
+
+.valueRow:last-child {
+    border-bottom: none;
+}
+
+.valueCell {
+    padding: var(--space-2) var(--space-3);
+    vertical-align: middle;
+}
+
+.valueActions {
+    display: flex;
+    gap: var(--space-1);
+}
+
+.pricePositive {
+    color: var(--color-success);
+    font-weight: var(--font-medium);
+}
+
+.booleanPrice {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+}
+
+.emptyValues {
+    text-align: center;
+    padding: var(--space-4);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    font-style: italic;
+}

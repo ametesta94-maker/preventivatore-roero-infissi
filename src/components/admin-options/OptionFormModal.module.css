@@ -1,0 +1,160 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: var(--space-4);
+}
+
+.modal {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modalHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-5) var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.modalHeader h2 {
+    margin: 0;
+    font-size: var(--text-lg);
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    font-size: var(--text-xl);
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    padding: var(--space-1);
+    line-height: 1;
+}
+
+.closeBtn:hover {
+    color: var(--color-text);
+}
+
+.modalBody {
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.formLabel {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--color-text);
+}
+
+.formInput,
+.formSelect {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    background: var(--color-background);
+    color: var(--color-text);
+    transition: border-color 0.15s;
+}
+
+.formInput:focus,
+.formSelect:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-primary-light);
+}
+
+.formHint {
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+}
+
+.formError {
+    font-size: var(--text-xs);
+    color: var(--color-error);
+}
+
+.checkboxGroup {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.checkboxGroup label {
+    font-size: var(--text-sm);
+    cursor: pointer;
+}
+
+.formRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+}
+
+.dependencySection {
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-4);
+    margin-top: var(--space-2);
+}
+
+.dependencyTitle {
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+}
+
+.multiSelectList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    min-height: 40px;
+    background: var(--color-background);
+}
+
+.multiSelectChip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    cursor: pointer;
+}
+
+.multiSelectChip:hover {
+    background: var(--color-primary);
+    color: white;
+}
+
+.modalFooter {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-6);
+    border-top: 1px solid var(--color-border);
+}

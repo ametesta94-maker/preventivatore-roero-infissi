@@ -1,0 +1,181 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.modal {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modalHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-5) var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.modalHeader h2 {
+    font-size: var(--text-lg);
+    font-weight: var(--font-bold);
+    color: var(--color-text-dark);
+    margin: 0;
+}
+
+.closeBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.closeBtn:hover {
+    background-color: var(--color-surface-hover);
+    color: var(--color-text-dark);
+}
+
+.modalBody {
+    padding: var(--space-6);
+}
+
+.description {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-5);
+    line-height: 1.5;
+}
+
+.description strong {
+    color: var(--color-text-dark);
+}
+
+.errorBox {
+    padding: var(--space-3) var(--space-4);
+    background-color: #fee2e2;
+    color: #dc2626;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-4);
+}
+
+.field {
+    margin-bottom: var(--space-5);
+}
+
+.label {
+    display: block;
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-dark);
+    margin-bottom: var(--space-2);
+}
+
+.radioGroup {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.radioLabel {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: var(--text-sm);
+    transition: all var(--transition-fast);
+}
+
+.radioLabel:hover {
+    border-color: var(--color-secondary);
+    background-color: rgba(var(--color-secondary-rgb, 59, 130, 246), 0.05);
+}
+
+.radioLabel input[type="radio"] {
+    accent-color: var(--color-secondary);
+}
+
+.textarea {
+    width: 100%;
+    padding: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-family: inherit;
+    resize: vertical;
+    transition: border-color var(--transition-fast);
+}
+
+.textarea:focus {
+    outline: none;
+    border-color: var(--color-secondary);
+}
+
+.modalFooter {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-6);
+    border-top: 1px solid var(--color-border);
+}
+
+.btnCancel {
+    padding: var(--space-2) var(--space-4);
+    background-color: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btnCancel:hover {
+    background-color: var(--color-surface-hover);
+}
+
+.btnConfirm {
+    padding: var(--space-2) var(--space-4);
+    background-color: var(--color-secondary);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: white;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btnConfirm:hover:not(:disabled) {
+    background-color: var(--color-secondary-dark);
+}
+
+.btnConfirm:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

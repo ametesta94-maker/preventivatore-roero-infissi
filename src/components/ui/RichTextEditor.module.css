@@ -1,0 +1,94 @@
+.editorWrapper {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 8px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+}
+
+.toolbarBtn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #374151;
+}
+
+.toolbarBtn:hover {
+    background: #e5e7eb;
+}
+
+.toolbarBtn.active {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.separator {
+    width: 1px;
+    height: 20px;
+    background: #d1d5db;
+    margin: 0 4px;
+}
+
+.editorContent {
+    min-height: 120px;
+    padding: 12px;
+    font-size: 14px;
+    line-height: 1.6;
+    outline: none;
+}
+
+.editorContent p {
+    margin: 0 0 8px 0;
+}
+
+.editorContent ul,
+.editorContent ol {
+    padding-left: 24px;
+    margin: 0 0 8px 0;
+}
+
+.variablesBar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-top: 1px solid #e5e7eb;
+    background: #f9fafb;
+    flex-wrap: wrap;
+}
+
+.variablesLabel {
+    font-size: 11px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.variableChip {
+    font-size: 11px;
+    padding: 2px 8px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    cursor: pointer;
+    color: #1d4ed8;
+    white-space: nowrap;
+}
+
+.variableChip:hover {
+    background: #dbeafe;
+}
