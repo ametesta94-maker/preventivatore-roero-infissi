@@ -68,7 +68,7 @@ export default function ClientiPage() {
                     </p>
                 </div>
                 <button
-                    onClick={() => openCRM('/')}
+                    onClick={() => openCRM('/?goto=nuovo_cliente')}
                     className="btn btn-outline"
                 >
                     Gestisci nel CRM ↗
@@ -115,7 +115,7 @@ export default function ClientiPage() {
                                 <td colSpan={5} className={styles.emptyState}>
                                     <div>
                                         <p>{query.length >= 2 ? `Nessun contatto trovato per "${query}"` : 'Nessun contatto nel CRM'}</p>
-                                        <button className="btn btn-primary btn-sm" onClick={() => openCRM('/')}>
+                                        <button className="btn btn-primary btn-sm" onClick={() => openCRM('/?goto=nuovo_cliente')}>
                                             Crea contatto nel CRM ↗
                                         </button>
                                     </div>
