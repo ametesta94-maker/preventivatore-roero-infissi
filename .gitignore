@@ -33,6 +33,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local migration helpers may contain service keys
+/scripts/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
@@ -41,3 +44,5 @@ next-env.d.ts
 *.env
 *.env.*
 !.env.example
+
+.vercel
