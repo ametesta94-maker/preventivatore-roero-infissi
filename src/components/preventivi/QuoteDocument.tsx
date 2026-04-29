@@ -177,7 +177,7 @@ export default function QuoteDocument({
     const totImponibileScontato = preventivo.totale_imponibile_scontato || totImponibile
     const totIva = preventivo.totale_iva || 0
     const totPreventivo = preventivo.totale_preventivo || 0
-    const ivaPercent = preventivo.aliquote_iva?.percentuale || 22
+    const ivaPercent = preventivo.aliquote_iva?.percentuale ?? 22
     const hasGlobalDiscount = preventivo.sconto_globale_1 || preventivo.sconto_globale_2
 
     // IVA combinata

@@ -301,6 +301,20 @@ function buildOptionRows(
     return rows
 }
 
+function getAliquotaDisplayLabel(aliquota: AliquotaIva): string {
+    const description = aliquota.descrizione?.trim()
+    return description ? `${aliquota.nome} - ${description}` : aliquota.nome
+}
+
+function getAliquotaShortLabel(aliquota?: AliquotaIva): string {
+    if (!aliquota) return 'IVA'
+    if (aliquota.is_combined && aliquota.rate_secondary != null) {
+        return `IVA ${aliquota.percentuale}% + ${aliquota.rate_secondary}%`
+    }
+    if (aliquota.percentuale > 0) return `IVA ${aliquota.percentuale}%`
+    return aliquota.nome || 'IVA'
+}
+
 export default function QuoteEditor({ initialData, preventivoId, mode }: QuoteEditorProps) {
     const [clienti, setClienti] = useState<ClienteOption[]>([])   // lista risultati ricerca CRM
     const [crmSearch, setCrmSearch] = useState('')
@@ -382,16 +396,40 @@ export default function QuoteEditor({ initialData, preventivoId, mode }: QuoteEd
             setLoading(true)
             const supabase = createClient()
 
-            const [aliquoteRes, categoriesRes, prodottiRes] = await Promise.all([
-                supabase.from('aliquote_iva').select('*').eq('attiva', true).order('ordine'),
+            const loadAliquote = async () => {
+                try {
+                    const res = await fetch('/api/aliquote-iva/from-crm')
+                    const data = await res.json()
+                    if (!res.ok) {
+                        throw new Error(data.error || 'Errore caricamento aliquote IVA dal CRM')
+                    }
+                    return (data.aliquote || []) as AliquotaIva[]
+                } catch (err) {
+                    const message = err instanceof Error ? err.message : 'Errore caricamento aliquote IVA dal CRM'
+                    console.error(message)
+
+                    const { data, error: fallbackError } = await supabase
+                        .from('aliquote_iva')
+                        .select('*')
+                        .eq('attiva', true)
+                        .order('ordine')
+
+                    if (fallbackError) throw new Error(`${message}. Fallback locale non disponibile: ${fallbackError.message}`)
+                    if (!data || data.length === 0) setError(message)
+                    return (data || []) as AliquotaIva[]
+                }
+            }
+
+            const [aliquoteData, categoriesRes, prodottiRes] = await Promise.all([
+                loadAliquote(),
                 supabase.from('categories').select('*').eq('attiva', true).order('ordine'),
                 supabase.from('prodotti').select('id, nome, prezzo_listino, category_id, unita_misura').eq('attivo', true).order('nome'),
             ])
 
-            if (aliquoteRes.data) {
-                setAliquote(aliquoteRes.data as AliquotaIva[])
-                if (aliquoteRes.data.length > 0 && !state.aliquota_iva_id && mode === 'create') {
-                    setField('aliquota_iva_id', aliquoteRes.data[0].id)
+            if (aliquoteData) {
+                setAliquote(aliquoteData)
+                if (aliquoteData.length > 0 && !state.aliquota_iva_id && mode === 'create') {
+                    setField('aliquota_iva_id', aliquoteData[0].id)
                 }
             }
             if (categoriesRes.data) setCategories(categoriesRes.data as Category[])
@@ -450,7 +488,7 @@ export default function QuoteEditor({ initialData, preventivoId, mode }: QuoteEd
         return calculateQuoteTotal({
             sezioni: state.sections.map(s => ({ subtotale_sezione: s.subtotale_sezione })),
             servizi: state.services.map(s => ({ quantity: s.quantity, unit_price: s.unit_price })),
-            aliquota_iva_percentuale: selectedAliquota?.percentuale || 22,
+            aliquota_iva_percentuale: selectedAliquota?.percentuale ?? 22,
             sconto_globale_1: state.sconto_globale_1,
             sconto_globale_2: state.sconto_globale_2,
             is_combined: selectedAliquota?.is_combined ?? false,
@@ -851,7 +889,7 @@ export default function QuoteEditor({ initialData, preventivoId, mode }: QuoteEd
                                 >
                                     <option value="">Seleziona aliquota...</option>
                                     {aliquote.map(a => (
-                                        <option key={a.id} value={a.id}>{a.nome} ({a.percentuale}%)</option>
+                                        <option key={a.id} value={a.id}>{getAliquotaDisplayLabel(a)}</option>
                                     ))}
                                 </select>
                             </div>
@@ -992,7 +1030,7 @@ export default function QuoteEditor({ initialData, preventivoId, mode }: QuoteEd
                         sconto_globale_1={state.sconto_globale_1}
                         sconto_globale_2={state.sconto_globale_2}
                         onScontoChange={(field, value) => setField(field, value)}
-                        aliquota_label={selectedAliquota ? `IVA ${selectedAliquota.percentuale}%` : 'IVA'}
+                        aliquota_label={getAliquotaShortLabel(selectedAliquota)}
                         show_iva={state.show_iva}
                         show_grand_total={state.show_grand_total}
                         payment_method_id={state.payment_method_id}
