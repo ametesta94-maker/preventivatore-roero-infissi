@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import type { Service } from '@/types/database'
 import type { QuoteServiceState } from '@/lib/hooks/useQuoteForm'
 import styles from './QuoteServices.module.css'
@@ -24,17 +23,15 @@ export default function QuoteServices({
 
     useEffect(() => {
         const loadServices = async () => {
-            const supabase = createClient()
-            const { data, error } = await supabase
-                .from('services')
-                .select('*')
-                .eq('is_active', true)
-                .order('sort_order')
-
-            if (!error && data) {
-                setAvailableServices(data)
+            try {
+                const res = await fetch('/api/preventivi/services')
+                const data = await res.json()
+                if (res.ok) {
+                    setAvailableServices((data.services || []) as Service[])
+                }
+            } finally {
+                setLoading(false)
             }
-            setLoading(false)
         }
 
         loadServices()

@@ -1,7 +1,6 @@
 'use client'
 
 import useSWR from 'swr'
-import { createClient } from '@/lib/supabase/client'
 import type { CategoryOption, CategoryOptionValue } from '@/types/database'
 
 interface CategoryOptionsData {
@@ -10,29 +9,15 @@ interface CategoryOptionsData {
 }
 
 async function fetchCategoryOptions(categoryId: string): Promise<CategoryOptionsData> {
-  const supabase = createClient()
-
-  const [optionsRes, valuesRes] = await Promise.all([
-    supabase
-      .from('category_options')
-      .select('*')
-      .eq('category_id', categoryId)
-      .eq('is_active', true)
-      .order('sort_order'),
-    supabase
-      .from('category_option_values')
-      .select('*, category_options!inner(category_id)')
-      .eq('category_options.category_id', categoryId)
-      .eq('is_active', true)
-      .order('sort_order'),
-  ])
+  const res = await fetch(`/api/categorie/${categoryId}/opzioni`)
+  const data = await res.json()
+  if (!res.ok) {
+    throw new Error(data.error || 'Errore caricamento opzioni categoria')
+  }
 
   return {
-    options: (optionsRes.data || []) as CategoryOption[],
-    values: ((valuesRes.data || []) as (CategoryOptionValue & { category_options: unknown })[]).map(
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      ({ category_options: _, ...v }) => v as CategoryOptionValue
-    ),
+    options: (data.options || []) as CategoryOption[],
+    values: (data.values || []) as CategoryOptionValue[],
   }
 }
 

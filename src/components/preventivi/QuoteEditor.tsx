@@ -136,12 +136,15 @@ function SectionWithOptions({
     )
 
     const onUpdatePositionPriceRef = useRef(onUpdatePositionPrice)
-    onUpdatePositionPriceRef.current = onUpdatePositionPrice
     const onUpdateSectionSubtotalRef = useRef(onUpdateSectionSubtotal)
-    onUpdateSectionSubtotalRef.current = onUpdateSectionSubtotal
 
     const prevPositionSubtotals = useRef<Record<string, number>>({})
     const prevSectionSubtotal = useRef<number>(0)
+
+    useEffect(() => {
+        onUpdatePositionPriceRef.current = onUpdatePositionPrice
+        onUpdateSectionSubtotalRef.current = onUpdateSectionSubtotal
+    }, [onUpdatePositionPrice, onUpdateSectionSubtotal])
 
     useEffect(() => {
         if (isLoading) return
@@ -233,72 +236,6 @@ function SectionWithOptions({
             onSetPositionOption={onSetPositionOption}
         />
     )
-}
-
-function buildOptionRows(
-    selections: Record<string, string | string[] | boolean | null>,
-    options: CategoryOption[],
-    values: CategoryOptionValue[]
-): Array<{
-    category_option_id: string
-    selected_value_id?: string
-    selected_text?: string
-    selected_boolean?: boolean
-    price_adjustment: number
-}> {
-    const rows = []
-    const optionByKey = new Map(options.map(o => [o.option_key, o]))
-    const valuesByOptionId = new Map<string, CategoryOptionValue[]>()
-    for (const v of values) {
-        const arr = valuesByOptionId.get(v.category_option_id) || []
-        arr.push(v)
-        valuesByOptionId.set(v.category_option_id, arr)
-    }
-
-    for (const [key, val] of Object.entries(selections)) {
-        if (val == null || val === '' || val === false) continue
-        const optDef = optionByKey.get(key)
-        if (!optDef) continue
-
-        if (typeof val === 'boolean') {
-            rows.push({
-                category_option_id: optDef.id,
-                selected_boolean: val,
-                price_adjustment: optDef.price_adjustment_default
-            })
-        } else if (typeof val === 'string') {
-            if (optDef.option_type === 'text' || optDef.option_type === 'number') {
-                rows.push({
-                    category_option_id: optDef.id,
-                    selected_text: val,
-                    price_adjustment: 0
-                })
-            } else {
-                const vals = valuesByOptionId.get(optDef.id) || []
-                const selectedVal = vals.find(v => v.value_key === val)
-                if (selectedVal) {
-                    rows.push({
-                        category_option_id: optDef.id,
-                        selected_value_id: selectedVal.id,
-                        price_adjustment: selectedVal.price_adjustment
-                    })
-                }
-            }
-        } else if (Array.isArray(val)) {
-            const vals = valuesByOptionId.get(optDef.id) || []
-            for (const vKey of val) {
-                const selectedVal = vals.find(v => v.value_key === vKey)
-                if (selectedVal) {
-                    rows.push({
-                        category_option_id: optDef.id,
-                        selected_value_id: selectedVal.id,
-                        price_adjustment: selectedVal.price_adjustment
-                    })
-                }
-            }
-        }
-    }
-    return rows
 }
 
 function getAliquotaDisplayLabel(aliquota: AliquotaIva): string {
@@ -420,35 +357,47 @@ export default function QuoteEditor({ initialData, preventivoId, mode }: QuoteEd
                 }
             }
 
-            const [aliquoteData, categoriesRes, prodottiRes] = await Promise.all([
-                loadAliquote(),
-                supabase.from('categories').select('*').eq('attiva', true).order('ordine'),
-                supabase.from('prodotti').select('id, nome, prezzo_listino, category_id, unita_misura').eq('attivo', true).order('nome'),
-            ])
-
-            if (aliquoteData) {
-                setAliquote(aliquoteData)
-                if (aliquoteData.length > 0 && !state.aliquota_iva_id && mode === 'create') {
-                    setField('aliquota_iva_id', aliquoteData[0].id)
+            const loadCatalogoPreventivo = async () => {
+                const res = await fetch('/api/preventivi/catalogo')
+                const data = await res.json()
+                if (!res.ok) {
+                    throw new Error(data.error || 'Errore caricamento catalogo preventivo')
                 }
+                return data as { categories: Category[]; prodotti: ProdottoOption[] }
             }
-            if (categoriesRes.data) setCategories(categoriesRes.data as Category[])
-            if (prodottiRes.data) setProdotti(prodottiRes.data as ProdottoOption[])
 
-            // Auto-fill emesso_da dalla sessione CRM (non più da Supabase Auth)
-            if (!state.emesso_da) {
-                try {
-                    const meRes = await fetch('/api/auth/me')
-                    if (meRes.ok) {
-                        const meData = await meRes.json()
-                        if (meData.user?.display_name) setField('emesso_da', meData.user.display_name)
+            try {
+                const [aliquoteData, catalogoData] = await Promise.all([
+                    loadAliquote(),
+                    loadCatalogoPreventivo(),
+                ])
+
+                if (aliquoteData) {
+                    setAliquote(aliquoteData)
+                    if (aliquoteData.length > 0 && !state.aliquota_iva_id && mode === 'create') {
+                        setField('aliquota_iva_id', aliquoteData[0].id)
                     }
-                } catch {
-                    // Non blocca il caricamento
                 }
-            }
+                setCategories(catalogoData.categories || [])
+                setProdotti(catalogoData.prodotti || [])
 
-            setLoading(false)
+                // Auto-fill emesso_da dalla sessione CRM
+                if (!state.emesso_da) {
+                    try {
+                        const meRes = await fetch('/api/auth/me')
+                        if (meRes.ok) {
+                            const meData = await meRes.json()
+                            if (meData.user?.display_name) setField('emesso_da', meData.user.display_name)
+                        }
+                    } catch {
+                        // Non blocca il caricamento
+                    }
+                }
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Errore durante il caricamento dati')
+            } finally {
+                setLoading(false)
+            }
         }
         loadData()
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -461,14 +410,17 @@ export default function QuoteEditor({ initialData, preventivoId, mode }: QuoteEd
             return
         }
         const loadSedi = async () => {
-            const supabase = createClient()
-            const { data } = await supabase
-                .from('sedi')
-                .select('id, nome_sede, cliente_id')
-                .eq('cliente_id', state.cliente_id)
-                .eq('attiva', true)
-                .order('nome_sede')
-            setSedi(data || [])
+            try {
+                const res = await fetch(`/api/clienti/${state.cliente_id}/sedi`)
+                const data = await res.json()
+                if (res.ok) {
+                    setSedi(data.sedi || [])
+                } else {
+                    setSedi([])
+                }
+            } catch {
+                setSedi([])
+            }
         }
         loadSedi()
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -515,7 +467,7 @@ export default function QuoteEditor({ initialData, preventivoId, mode }: QuoteEd
             return
         }
         if (state.sections.length === 0) {
-            setError('Aggiungi almeno una sezione al preventivo')
+            setError('Aggiungi almeno un prodotto/sezione al preventivo prima di salvare')
             return
         }
 
@@ -524,7 +476,7 @@ export default function QuoteEditor({ initialData, preventivoId, mode }: QuoteEd
             const hasManualTotal = section.manual_total_override != null
             const hasFreeDescription = section.free_description && section.free_description.trim() !== ''
             if (!hasProduct && !hasManualTotal && !hasFreeDescription) {
-                setError(`La sezione "${section.category.nome}" deve avere almeno una posizione con un prodotto`)
+                setError(`La sezione "${section.category.nome}" deve avere almeno un prodotto, un totale manuale o una descrizione libera`)
                 return
             }
         }
@@ -532,10 +484,7 @@ export default function QuoteEditor({ initialData, preventivoId, mode }: QuoteEd
         setSaving(true)
 
         try {
-            const supabase = createClient()
-            let currentPreventivoId = preventivoId
-
-            // Risolvi il contatto CRM in un UUID Supabase se necessario
+            // Risolvi il contatto CRM in un UUID Supabase se necessario.
             let resolvedClienteId = state.cliente_id
             if (state.cliente_id.startsWith('crm_')) {
                 const crmContact = clienti.find(c => c.id === state.cliente_id)
@@ -587,172 +536,23 @@ export default function QuoteEditor({ initialData, preventivoId, mode }: QuoteEd
                 emesso_da: state.emesso_da || null,
             }
 
-            if (mode === 'create') {
-                const { data: numero } = await supabase.rpc('genera_numero_preventivo')
-                if (!numero) throw new Error('Impossibile generare il numero preventivo')
-
-                const { data: preventivo, error: prevError } = await supabase
-                    .from('preventivi')
-                    .insert({
-                        ...commonData,
-                        numero,
-                    })
-                    .select()
-                    .single()
-                if (prevError) throw prevError
-                currentPreventivoId = preventivo.id
-            } else {
-                if (!currentPreventivoId) throw new Error('ID Preventivo mancante in modifica')
-                // Update request
-                const { error: prevError } = await supabase
-                    .from('preventivi')
-                    .update(commonData)
-                    .eq('id', currentPreventivoId)
-                if (prevError) throw prevError
-
-                // Delete existing sections (cascades to items and options)
-                const { error: delError } = await supabase
-                    .from('quote_sections')
-                    .delete()
-                    .eq('preventivo_id', currentPreventivoId)
-                if (delError) throw delError
-
-                // Delete existing services
-                const { error: delServicesError } = await supabase
-                    .from('quote_services')
-                    .delete()
-                    .eq('quote_id', currentPreventivoId)
-                if (delServicesError) throw delServicesError
+            const saveRes = await fetch('/api/preventivi/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    mode,
+                    preventivoId,
+                    preventivo: commonData,
+                    sections: state.sections,
+                    services: state.services,
+                }),
+            })
+            const saveData = await saveRes.json()
+            if (!saveRes.ok || saveData.error || !saveData.id) {
+                throw new Error(saveData.error || 'Errore durante il salvataggio del preventivo')
             }
 
-            if (!currentPreventivoId) throw new Error('Failed to get preventivo ID')
-
-            // Fetch options metadata (same as before)
-            const categoryIds = [...new Set(state.sections.map(s => s.category_id))]
-            const categoryOptionsMap = new Map<string, { options: CategoryOption[]; values: CategoryOptionValue[] }>()
-
-            for (const catId of categoryIds) {
-                const [optRes, valRes] = await Promise.all([
-                    supabase.from('category_options').select('*').eq('category_id', catId).eq('is_active', true),
-                    supabase.from('category_option_values').select('*, category_options!inner(category_id)')
-                        .eq('category_options.category_id', catId).eq('is_active', true),
-                ])
-                categoryOptionsMap.set(catId, {
-                    options: (optRes.data || []) as CategoryOption[],
-                    values: ((valRes.data || []) as (CategoryOptionValue & { category_options: unknown })[]).map(
-                        ({ category_options: _, ...v }) => v as CategoryOptionValue
-                    ),
-                })
-            }
-
-            // Insert all sections and items
-            for (let sIdx = 0; sIdx < state.sections.length; sIdx++) {
-                const section = state.sections[sIdx]
-                const catData = categoryOptionsMap.get(section.category_id) || { options: [], values: [] }
-                const globalOpts = catData.options.filter(o => !o.applies_to_position)
-                const globalVals = catData.values.filter(v => {
-                    const optIds = new Set(globalOpts.map(o => o.id))
-                    return optIds.has(v.category_option_id)
-                })
-                const posOpts = catData.options.filter(o => o.applies_to_position)
-                const posVals = catData.values.filter(v => {
-                    const optIds = new Set(posOpts.map(o => o.id))
-                    return optIds.has(v.category_option_id)
-                })
-
-                const { data: dbSection, error: sectionError } = await supabase
-                    .from('quote_sections')
-                    .insert({
-                        preventivo_id: currentPreventivoId,
-                        category_id: section.category_id,
-                        ordine: sIdx + 1,
-                        trasporto: section.trasporto,
-                        posa: section.posa,
-                        sconto_percentuale: section.sconto_percentuale,
-                        subtotale_sezione: section.subtotale_sezione,
-                        show_line_prices: section.show_line_prices ?? true,
-                        manual_total_override: section.manual_total_override ?? null,
-                        notes: section.notes || null,
-                        free_description: section.free_description || null,
-                    })
-                    .select()
-                    .single()
-
-                if (sectionError) throw sectionError
-
-                const sectionOptionRows = buildOptionRows(section.globalOptions, globalOpts, globalVals)
-                if (sectionOptionRows.length > 0) {
-                    const { error: soError } = await supabase
-                        .from('quote_section_options')
-                        .insert(sectionOptionRows.map(row => ({
-                            quote_section_id: dbSection.id,
-                            category_option_id: row.category_option_id,
-                            selected_value_id: row.selected_value_id,
-                            selected_text: row.selected_text,
-                            selected_boolean: row.selected_boolean,
-                            price_adjustment: row.price_adjustment,
-                        })))
-                    if (soError) throw soError
-                }
-
-                for (let pIdx = 0; pIdx < section.positions.length; pIdx++) {
-                    const position = section.positions[pIdx]
-                    if (!position.prodotto_id) continue
-
-                    const { data: dbRiga, error: rigaError } = await supabase
-                        .from('righe_preventivo')
-                        .insert({
-                            preventivo_id: currentPreventivoId,
-                            quote_section_id: dbSection.id,
-                            prodotto_id: position.prodotto_id,
-                            numero_riga: pIdx + 1,
-                            quantita: position.quantita,
-                            larghezza_mm: position.larghezza_mm || null,
-                            altezza_mm: position.altezza_mm || null,
-                            posizione_locale: position.posizione_locale || null,
-                            descrizione_personalizzata: position.descrizione || null,
-                            prezzo_unitario_effettivo: position.prezzo_unitario,
-                            subtotale_riga: position.subtotale_calcolato,
-                            manual_price_override: position.manual_price_override ?? null,
-                        })
-                        .select()
-                        .single()
-
-                    if (rigaError) throw rigaError
-
-                    const itemOptionRows = buildOptionRows(position.positionOptions, posOpts, posVals)
-                    if (itemOptionRows.length > 0) {
-                        const { error: ioError } = await supabase
-                            .from('quote_item_options')
-                            .insert(itemOptionRows.map(row => ({
-                                riga_preventivo_id: dbRiga.id,
-                                category_option_id: row.category_option_id,
-                                selected_value_id: row.selected_value_id,
-                                selected_text: row.selected_text,
-                                selected_boolean: row.selected_boolean,
-                                price_adjustment: row.price_adjustment,
-                            })))
-                        if (ioError) throw ioError
-                    }
-                }
-            }
-
-            // Insert services
-            if (state.services.length > 0) {
-                const { error: servicesError } = await supabase
-                    .from('quote_services')
-                    .insert(state.services.map((s, sIdx) => ({
-                        quote_id: currentPreventivoId,
-                        service_id: s.service_id,
-                        quantity: s.quantity,
-                        unit_price: s.unit_price,
-                        notes: s.notes || null,
-                        sort_order: sIdx + 1,
-                    })))
-                if (servicesError) throw servicesError
-            }
-
-            router.push(`/preventivi/${currentPreventivoId}`)
+            router.push(`/preventivi/${saveData.id}`)
             router.refresh()
         } catch (err: unknown) {
             console.error(err)
@@ -974,7 +774,7 @@ export default function QuoteEditor({ initialData, preventivoId, mode }: QuoteEd
                         <div className={styles.addSectionArea}>
                             {showCategoryPicker ? (
                                 <div className={styles.categoryPicker}>
-                                    <p className={styles.pickerLabel}>Seleziona categoria:</p>
+                                    <p className={styles.pickerLabel}>Scegli il tipo di prodotto:</p>
                                     <div className={styles.categoryGrid}>
                                         {availableCategories.map(cat => (
                                             <button
@@ -1003,9 +803,16 @@ export default function QuoteEditor({ initialData, preventivoId, mode }: QuoteEd
                                     className="btn btn-secondary"
                                     onClick={() => setShowCategoryPicker(true)}
                                 >
-                                    + Aggiungi Sezione
+                                    + Aggiungi prodotto / sezione
                                 </button>
                             )}
+                        </div>
+                    )}
+                    {availableCategories.length === 0 && (
+                        <div className={styles.addSectionArea}>
+                            <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem' }}>
+                                Catalogo prodotti non caricato. Ricarica la pagina o verifica le impostazioni catalogo.
+                            </div>
                         </div>
                     )}
                 </div>

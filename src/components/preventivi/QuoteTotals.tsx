@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import type { PaymentMethod } from '@/types/database'
 import styles from './QuoteTotals.module.css'
 
@@ -64,17 +63,15 @@ export default function QuoteTotals({
 
   useEffect(() => {
     const loadPaymentMethods = async () => {
-      const supabase = createClient()
-      const { data, error } = await supabase
-        .from('payment_methods')
-        .select('*')
-        .eq('is_active', true)
-        .order('sort_order')
-
-      if (!error && data) {
-        setPaymentMethods(data)
+      try {
+        const res = await fetch('/api/preventivi/payment-methods')
+        const data = await res.json()
+        if (res.ok) {
+          setPaymentMethods((data.paymentMethods || []) as PaymentMethod[])
+        }
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
 
     loadPaymentMethods()
