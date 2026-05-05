@@ -57,17 +57,21 @@ export default function CategoriePage() {
     const handleDelete = async (id: string, nome: string) => {
         if (!confirm(`Eliminare il prodotto "${nome}"? Verranno eliminate anche tutte le opzioni associate.`)) return
 
-        const supabase = createClient()
-        const { error } = await supabase.from('categories').delete().eq('id', id)
+        const res = await fetch(`/api/categorie/${id}`, { method: 'DELETE' })
 
-        if (error) {
-            if (error.code === '23503') {
+        if (!res.ok) {
+            const result = await res.json()
+            if (result.code === '23503') {
                 if (confirm(`Il prodotto "${nome}" è usato in posizioni o preventivi. Vuoi disattivarlo invece?`)) {
-                    await supabase.from('categories').update({ attiva: false }).eq('id', id)
+                    await fetch(`/api/categorie/${id}`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ attiva: false }),
+                    })
                     await fetchCategories()
                 }
             } else {
-                alert('Errore: ' + error.message)
+                alert('Errore: ' + (result.error || 'Eliminazione fallita'))
             }
             return
         }
@@ -75,21 +79,26 @@ export default function CategoriePage() {
     }
 
     const handleSave = async (data: Partial<Category>) => {
-        const supabase = createClient()
-
         if (modal.mode === 'create') {
-            const { error } = await supabase.from('categories').insert(data as Category)
-            if (error) {
-                alert('Errore creazione: ' + error.message)
+            const res = await fetch('/api/categorie', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            })
+            if (!res.ok) {
+                const result = await res.json()
+                alert(result.error || 'Errore creazione prodotto')
                 return
             }
         } else if (modal.mode === 'edit') {
-            const { error } = await supabase
-                .from('categories')
-                .update(data)
-                .eq('id', modal.category.id)
-            if (error) {
-                alert('Errore aggiornamento: ' + error.message)
+            const res = await fetch(`/api/categorie/${modal.category.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            })
+            if (!res.ok) {
+                const result = await res.json()
+                alert(result.error || 'Errore aggiornamento prodotto')
                 return
             }
         }
